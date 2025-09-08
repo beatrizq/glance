@@ -1,0 +1,208 @@
+- name: Home
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  # hide-desktop-navigation: true
+  # configure the widgets or layout of the home page
+  columns:
+    - size: small
+      widgets:
+
+        - type: to-do
+          title: To Do
+          id: home-todo
+
+        - type: custom-api
+          title: Currently Reading
+          cache: 6h
+          url: http://aggregator:5000/goodreads-reading
+          template: |
+            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+            {{ range .JSON.Array "specials.items" }}
+              <div style="text-align: center;">
+                <img src="{{ .String "book_cover" }}" alt="{{ .String "book_name" }}" style="display: block; margin: 0 auto 15px auto; max-width: 150px; height: auto;" />
+                <a href="{{ .String "book_link" }}" class="size-h3 color-positive" style="margin: 10px 0 5px 0;">{{ .String "book_name" }}</a>
+                <p style="margin: 0; font-style: italic;">{{ .String "author" }}</p>
+              </div>
+            {{ end }}
+            </ul>
+
+        - type: custom-api
+          title: Last Plays
+          cache: 6h
+          url: http://aggregator:5000/bgg-lastplays
+          template: |
+            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+            {{ range .JSON.Array "specials.items" }}
+              <li>
+                <a class="size-h4 color-positive" href="https://boardgamegeek.com/boardgame/{{ .Int "id" }}/">{{ .String "name" }}</a>
+                <ul class="list-horizontal-text">
+                  <li>{{ .String "date" }}</li>
+                  <li>{{ .Int "num_players" }}p</li>
+                </ul>
+              </li>
+            {{ end }}
+            </ul>
+
+    - size: full
+      widgets:
+        - type: search
+          search-engine: duckduckgo
+          bangs:
+            - title: YouTube
+              shortcut: "yt"
+              url: https://www.youtube.com/results?search_query={QUERY}
+            - title: Perplexity
+              shortcut: "pp"
+              url: https://www.perplexity.ai/search?q={QUERY}
+            - title: Amazon ES
+              shortcut: "amz"
+              url: https://www.amazon.es/search?q={QUERY}
+
+        - type: group
+          widgets:
+            - type: videos
+              title: YT/Entertainment
+              limit: 10
+              style: horizontal-cards
+              channels:
+                - UCF_votze88WRDSEREe9s3aQ # Dylan is in Trouble
+                - UCY6Ij8zOds0WJEeqCLOnqOQ # Alex Meyers
+                - UCbDmEdLs-SB3FjrDFQJ4TDg # Reysu
+                - UC91V6D3nkhP89wUb9f_h17g # MeatCanyon
+                - UCPdaxSov0mgwh77JvjQO2jQ # Man Carrying Thing
+                - UCOgP-kM_X9xfLlifX5OA8mA # Milano the duelist
+            - type: videos
+              title: YT/EDC
+              limit: 10
+              style: horizontal-cards
+              channels:
+                - UCm4_Wd1EW7kGYvVhC77Yzpg # Josh Fenn
+                - UCj7ML5-da-bCCcHz0ipUmYQ # Excessorize Me
+                - UC-lOss13v6QhqkO9yfNVJEw # Jon Gadget
+                - UCcB3cf8Yst54E3Zqttz7tJA # Maggi Fuchs
+            - type: videos
+              title: YT/Boardgames
+              limit: 10
+              style: horizontal-cards
+              channels:
+                - UCUKEGjiSoFnemBsCLKrdeJA # BoardgameCo
+
+        - type: group
+          widgets:
+            - type: reddit
+              subreddit: technology
+              show-thumbnails: true
+            - type: reddit
+              subreddit: selfhosted
+              show-thumbnails: true
+
+    - size: small
+      widgets:
+        - type: releases
+          cache: 1d
+          # Without authentication the Github API allows for up to 60 requests per hour. You can create a
+          # read-only token from your Github account settings and use it here to increase the limit.
+          # token: ...
+          repositories:
+            - glanceapp/glance
+            - go-gitea/gitea
+            - immich-app/immich
+            - syncthing/syncthing
+
+        - type: group
+          widgets:
+          - type: custom-api
+            title: Hot/BGG
+            cache: 6h
+            url: http://aggregator:5000/bgg-hotness
+            template: |
+              <div class="games-list">
+              <ul class="list list-gap-10 collapsible-container" data-collapse-after="10">
+                {{ range .JSON.Array "specials.items" }}
+                  <li class="flex align-center mb-3">
+                    <div style="width:36px; height:36px; background:#23232a; color:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:500; margin-right:8px; flex-shrink:0; flex-grow:0; text-align:center;">{{ .String "rank" }}
+                    </div>
+                    <div>
+                      <a class="size-h4 color-positive" href="https://boardgamegeek.com/boardgame/{{ .Int "id" }}/">{{ .String "name" }}</a>
+                      <div style="font-size:13px;color:#666;">
+                        {{ .String "yearpublished" }}
+                      </div>
+                    </div>
+                  </li>
+                {{ end }}
+              </ul>
+              </div>
+          - type: custom-api
+            title: Hot/Music
+            cache: 6h
+            url: http://aggregator:5000/bgg-hotness
+            template: |
+              <div class="games-list">
+              <ul class="list list-gap-10 collapsible-container" data-collapse-after="10">
+                {{ range .JSON.Array "specials.items" }}
+                  <li class="flex align-center mb-3">
+                    <div style="width:36px; height:36px; background:#23232a; color:#fff; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:500; margin-right:8px; flex-shrink:0; flex-grow:0; text-align:center;">{{ .String "rank" }}
+                    </div>
+                    <div>
+                      <a class="size-h4 color-positive" href="https://boardgamegeek.com/boardgame/{{ .Int "id" }}/">{{ .String "name" }}</a>
+                      <div style="font-size:13px;color:#666;">
+                        {{ .String "yearpublished" }}
+                      </div>
+                    </div>
+                  </li>
+                {{ end }}
+              </ul>
+              </div>
+
+
+############ PAGE 2 ###########
+
+- name: Status
+
+  center-vertically: true
+
+  width: slim
+
+  columns:
+
+    - size: full
+      widgets:
+        - type: calendar
+          first-day-of-week: monday
+
+        - type: custom-api
+          title: Last Plays
+          cache: 6h
+          url: http://aggregator:5000/bgg-lastplays
+          template: |
+            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+            {{ range .JSON.Array "specials.items" }}
+              <li>
+                <a class="size-h4 color-positive" href="https://boardgamegeek.com/boardgame/{{ .Int "id" }}/">{{ .String "name" }}</a>
+                <ul class="list-horizontal-text">
+                  <li>{{ .String "date" }}</li>
+                  <li>{{ .Int "num_players" }}p</li>
+                </ul>
+              </li>
+            {{ end }}
+            </ul>
+
+    - size: full
+      widgets:
+        - type: to-do
+          title: To Do
+          id: status-todo
+
+        - type: custom-api
+          title: Currently Reading
+          cache: 6h
+          url: http://aggregator:5000/goodreads-reading
+          template: |
+            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+            {{ range .JSON.Array "specials.items" }}
+              <div style="text-align: center;">
+                <img src="{{ .String "book_cover" }}" alt="{{ .String "book_name" }}" style="display: block; margin: 0 auto 15px auto; max-width: 150px; height: auto;" />
+                <a href="{{ .String "book_link" }}" class="size-h3 color-positive" style="margin: 10px 0 5px 0;">{{ .String "book_name" }}</a>
+                <p style="margin: 0; font-style: italic;">{{ .String "author" }}</p>
+              </div>
+            {{ end }}
+            </ul>

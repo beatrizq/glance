@@ -1,0 +1,26 @@
+services:
+
+  glance:
+    container_name: glance
+    image: glanceapp/glance
+    restart: unless-stopped
+    volumes:
+      - ./glance/config:/app/config
+      - ./glance/assets:/app/assets
+      - /etc/localtime:/etc/localtime:ro
+      # Optionally, also mount docker socket if you want to use the docker containers widget
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8080:8080
+    env_file: ./glance/.env
+
+  aggregator:
+    build:
+      context: ./aggregator
+    command: python app.py
+    restart: unless-stopped
+    volumes:
+      - ./aggregator:/app
+    ports:
+      - "5000:5000"
+    env_file: ./aggregator/.env
