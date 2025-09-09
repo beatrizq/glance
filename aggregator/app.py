@@ -95,13 +95,16 @@ def get_currently_reading():
             book_link = item.get('link', '').strip()
             book_cover = item.get('book_large_image_url', '').strip()
             description = item.get('description', '')
-            match = re.search(r'author:\s*(.*?)<br/>', description)
-            author = match.group(1).strip() if match else ''
+            match_author = re.search(r'author:\s*(.*?)<br/>', description)
+            author = match_author.group(1).strip() if match_author else ''
+            match_date_added = re.search(r'date added:\s*(.*?)<br/>', description)
+            date_added = match_date_added.group(1).strip() if match_date_added else ''
             item = {
                 "book_name": book_name,
                 "book_link": book_link,
                 "book_cover": book_cover,
-                "author": author
+                "author": author,
+                "date_added": date_added
             }
             books.append(item)
 
@@ -114,6 +117,58 @@ def get_currently_reading():
         }
     return jsonify(wrapped_data)
 
+@app.route('/pt-news')
+def get_pt_news():
+    from datetime import date, timedelta
+    yesterday = date.today() - timedelta(days=1)
+    yesterday_str = yesterday.strftime('%Y-%m-%d')
+    url_yesterday = f"https://api.worldnewsapi.com/top-news?source-country=pt&language=pt&date={yesterday_str}&api-key=679d6630d03a47b5bd6d480799448e3b"
+    today_str = date.today().strftime('%Y-%m-%d')
+    url_today = f"https://api.worldnewsapi.com/top-news?source-country=pt&language=pt&date={today_str}&api-key=679d6630d03a47b5bd6d480799448e3b"
+    resp = requests.get(url_today)
+    if resp.status_code == 200:
+        data = resp.json()
+        news = []
+        if len(data["top_news"]) > 0:
+            for i in data["top_news"]:
+                for j in i['news']:
+                    title = j["title"]
+                    image = j["image"]
+                    url = j["url"]
+                    publish_date = j["publish_date"]
+                    item = {
+                        "title": title,
+                        "image": image,
+                        "url": url,
+                        "publish_date": publish_date
+                    }
+                    news.append(item)
+        else:
+            resp = requests.get(url_yesterday)
+            if resp.status_code == 200:
+                data = resp.json()
+                news = []
+                for i in data["top_news"]:
+                    for j in i['news']:
+                        title = j["title"]
+                        image = j["image"]
+                        url = j["url"]
+                        publish_date = j["publish_date"]
+                        item = {
+                            "title": title,
+                            "image": image,
+                            "url": url,
+                            "publish_date": publish_date
+                        }
+                        news.append(item)
+        wrapped_data = {
+            "specials": {
+                "id": "cat_specials",
+                "name": "Specials",
+                "items": news
+            }
+        }
+    return jsonify(wrapped_data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, threaded=True)

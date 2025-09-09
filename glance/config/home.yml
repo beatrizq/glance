@@ -6,9 +6,16 @@
     - size: small
       widgets:
 
-        - type: to-do
-          title: To Do
-          id: home-todo
+        - type: repository
+          title: Coding Projects
+          repository: beatrizq/glance
+          pull-requests-limit: 0
+          issues-limit: 0
+          commits-limit: 3
+
+        #- type: iframe
+        #  source: https://git-graph.vercel.app/embed/beatrizq?showColorLegend=false&showWeekdayLabels=false&showMonthLabels=false&showTotalCount=false&blockMargin=2&blockRadius=2&blockSize=9&fontSize=12&weekStart=1&year=2025
+        #  height: 100
 
         - type: custom-api
           title: Currently Reading
@@ -44,18 +51,22 @@
 
     - size: full
       widgets:
-        - type: search
-          search-engine: duckduckgo
-          bangs:
-            - title: YouTube
-              shortcut: "yt"
-              url: https://www.youtube.com/results?search_query={QUERY}
-            - title: Perplexity
-              shortcut: "pp"
-              url: https://www.perplexity.ai/search?q={QUERY}
-            - title: Amazon ES
-              shortcut: "amz"
-              url: https://www.amazon.es/search?q={QUERY}
+        - type: to-do
+          title: To Do
+          id: home-todo
+
+        #- type: search
+        #  search-engine: duckduckgo
+        #  bangs:
+        #    - title: YouTube
+        #      shortcut: "yt"
+        #      url: https://www.youtube.com/results?search_query={QUERY}
+        #    - title: Perplexity
+        #      shortcut: "pp"
+        #      url: https://www.perplexity.ai/search?q={QUERY}
+        #    - title: Amazon ES
+        #      shortcut: "amz"
+        #      url: https://www.amazon.es/search?q={QUERY}
 
         - type: group
           widgets:
@@ -85,6 +96,14 @@
               style: horizontal-cards
               channels:
                 - UCUKEGjiSoFnemBsCLKrdeJA # BoardgameCo
+            - type: videos
+              title: YT/Smosh
+              limit: 10
+              style: horizontal-cards
+              channels:
+                - UCJ2ZDzMRgSrxmwphstrm8Ww # Smosh Games
+                - UCEyodonqP_80YrDvattntmw # Smosh Cast
+                - UCYJPby9DRCteedh5tfxVbrw # Smosh Pit
 
         - type: group
           widgets:
@@ -94,6 +113,30 @@
             - type: reddit
               subreddit: selfhosted
               show-thumbnails: true
+            - type: reddit
+              subreddit: portugal
+              show-thumbnails: true
+            - type: custom-api
+              title: PT/Top
+              url: http://aggregator:5000/pt-news
+              template: |
+                <div class="news-list">
+                <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+                  {{ range .JSON.Array "specials.items" }}
+                    <li class="flex align-center mb-3">
+                      <div style="width:60; height:40px; background:#23232a; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-right:8px; flex-shrink:0; flex-grow:0;">
+                        <img src="{{ .String "image" }}" alt="{{ .String "title" }}" style="width:60px; height:40px; object-fit:cover; border-radius:4px;" />
+                      </div>
+                      <div>
+                        <a class="size-h4 color-positive" href="{{ .String "url" }}/">{{ .String "title" }}</a>
+                        <div style="font-size:13px;color:#666;">
+                          {{ .String "publish_date" }}
+                        </div>
+                      </div>
+                    </li>
+                  {{ end }}
+                </ul>
+                </div>
 
     - size: small
       widgets:
@@ -154,20 +197,25 @@
               </div>
 
 
-############ PAGE 2 ###########
+################# PAGE 2 ###################
+
 
 - name: Status
 
   center-vertically: true
 
-  width: slim
+  width: default
 
   columns:
 
-    - size: full
+    - size: small
       widgets:
-        - type: calendar
-          first-day-of-week: monday
+        - type: repository
+          title: Coding Projects
+          repository: beatrizq/glance
+          pull-requests-limit: 0
+          issues-limit: 0
+          commits-limit: 3
 
         - type: custom-api
           title: Last Plays
@@ -188,10 +236,26 @@
 
     - size: full
       widgets:
-        - type: to-do
-          title: To Do
-          id: status-todo
+        - type: calendar
+          first-day-of-week: monday
+    
+        - type: weather
+          units: metric
+          hour-format: 24h
+          location: Porto, Portugal
 
+        - type: clock
+          hour-format: 24h
+          timezones:
+            - timezone: Europe/Lisbon
+              label: Portugal
+            - timezone: Europe/Berlin
+              label: Germany
+            - timezone: Asia/Kuala_Lumpur
+              label: Malaysia
+
+    - size: small
+      widgets:
         - type: custom-api
           title: Currently Reading
           cache: 6h
