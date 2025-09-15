@@ -5,49 +5,59 @@
   columns:
     - size: small
       widgets:
-
-        - type: repository
-          title: Coding Projects
-          repository: beatrizq/glance
-          pull-requests-limit: 0
-          issues-limit: 0
-          commits-limit: 3
-
-        #- type: iframe
-        #  source: https://git-graph.vercel.app/embed/beatrizq?showColorLegend=false&showWeekdayLabels=false&showMonthLabels=false&showTotalCount=false&blockMargin=2&blockRadius=2&blockSize=9&fontSize=12&weekStart=1&year=2025
-        #  height: 100
-
-        - type: custom-api
-          title: Currently Reading
-          cache: 6h
-          url: http://aggregator:5000/goodreads-reading
-          template: |
-            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
-            {{ range .JSON.Array "specials.items" }}
-              <div style="text-align: center;">
-                <img src="{{ .String "book_cover" }}" alt="{{ .String "book_name" }}" style="display: block; margin: 0 auto 15px auto; max-width: 150px; height: auto;" />
-                <a href="{{ .String "book_link" }}" class="size-h3 color-positive" style="margin: 10px 0 5px 0;">{{ .String "book_name" }}</a>
-                <p style="margin: 0; font-style: italic;">{{ .String "author" }}</p>
+        - type: group
+          widgets:
+          - type: custom-api
+            title: Hot/Movies
+            cache: 6h
+            url: http://aggregator:5000/trending_movies
+            template: |
+              <div class="games-list">
+              <ul class="list list-gap-10 collapsible-container" data-collapse-after="10">
+                {{ range .JSON.Array "specials.items" }}
+                  <li class="flex align-center mb-3">
+                      <div style="width:40; height:60px; background:#23232a; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-right:8px; flex-shrink:0; flex-grow:0;">
+                       <img src="{{ .String "poster_path" }}" alt="{{ .String "title" }}" style="width:40px; height:60px; object-fit:cover; border-radius:4px;" />
+                      </div>
+                      <div>
+                      <a class="size-h4 color-positive" href="{{ .String "url" }}">{{ .String "title" }}</a>
+                      <div style="font-size:13px;color:#666;">
+                        {{ .String "release_date" }}
+                      </div>
+                    </div>
+                  </li>
+                {{ end }}
+              </ul>
               </div>
-            {{ end }}
-            </ul>
 
-        - type: custom-api
-          title: Last Plays
-          cache: 6h
-          url: http://aggregator:5000/bgg-lastplays
-          template: |
-            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
-            {{ range .JSON.Array "specials.items" }}
-              <li>
-                <a class="size-h4 color-positive" href="https://boardgamegeek.com/boardgame/{{ .Int "id" }}/">{{ .String "name" }}</a>
-                <ul class="list-horizontal-text">
-                  <li>{{ .String "date" }}</li>
-                  <li>{{ .Int "num_players" }}p</li>
-                </ul>
-              </li>
-            {{ end }}
-            </ul>
+          - type: custom-api
+            title: Hot/TV
+            cache: 6h
+            url: http://aggregator:5000/trending_tv
+            template: |
+              <div class="games-list">
+              <ul class="list list-gap-10 collapsible-container" data-collapse-after="10">
+                {{ range .JSON.Array "specials.items" }}
+                  <li class="flex align-center mb-3">
+                      <div style="width:40; height:60px; background:#23232a; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-right:8px; flex-shrink:0; flex-grow:0;">
+                       <img src="{{ .String "poster_path" }}" alt="{{ .String "name" }}" style="width:40px; height:60px; object-fit:cover; border-radius:4px;" />
+                      </div>
+                      <div>
+                      <a class="size-h4 color-positive" href="{{ .String "url" }}">{{ .String "name" }}</a>
+                      <div style="font-size:13px;color:#666;">
+                        {{ .String "first_air_date" }}
+                      </div>
+                    </div>
+                  </li>
+                {{ end }}
+              </ul>
+              </div>
+
+
+           #           <div style="width:40; height:60px; background:#23232a; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-right:8px; flex-shrink:0; flex-grow:0;">
+           #             <img src="{{ .String "image" }}" alt="{{ .String "title" }}" style="width:40px; height:60px; object-fit:cover; border-radius:4px;" />
+           #           </div>
+           #           <div>
 
     - size: full
       widgets:
@@ -116,27 +126,27 @@
             - type: reddit
               subreddit: portugal
               show-thumbnails: true
-            - type: custom-api
-              title: PT/Top
-              url: http://aggregator:5000/pt-news
-              template: |
-                <div class="news-list">
-                <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
-                  {{ range .JSON.Array "specials.items" }}
-                    <li class="flex align-center mb-3">
-                      <div style="width:60; height:40px; background:#23232a; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-right:8px; flex-shrink:0; flex-grow:0;">
-                        <img src="{{ .String "image" }}" alt="{{ .String "title" }}" style="width:60px; height:40px; object-fit:cover; border-radius:4px;" />
-                      </div>
-                      <div>
-                        <a class="size-h4 color-positive" href="{{ .String "url" }}/">{{ .String "title" }}</a>
-                        <div style="font-size:13px;color:#666;">
-                          {{ .String "publish_date" }}
-                        </div>
-                      </div>
-                    </li>
-                  {{ end }}
-                </ul>
-                </div>
+           # - type: custom-api
+           #   title: PT/Top
+           #   url: http://aggregator:5000/pt-news
+           #   template: |
+           #     <div class="news-list">
+           #     <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+           #       {{ range .JSON.Array "specials.items" }}
+           #         <li class="flex align-center mb-3">
+           #           <div style="width:60; height:40px; background:#23232a; border-radius:6px; display:flex; align-items:center; justify-content:center; margin-right:8px; flex-shrink:0; flex-grow:0;">
+           #             <img src="{{ .String "image" }}" alt="{{ .String "title" }}" style="width:60px; height:40px; object-fit:cover; border-radius:4px;" />
+           #           </div>
+           #           <div>
+           #             <a class="size-h4 color-positive" href="{{ .String "url" }}/">{{ .String "title" }}</a>
+           #             <div style="font-size:13px;color:#666;">
+           #               {{ .String "publish_date" }}
+           #             </div>
+           #           </div>
+           #         </li>
+           #       {{ end }}
+           #     </ul>
+           #     </div>
 
     - size: small
       widgets:
@@ -210,12 +220,20 @@
 
     - size: small
       widgets:
-        - type: repository
-          title: Coding Projects
-          repository: beatrizq/glance
-          pull-requests-limit: 0
-          issues-limit: 0
-          commits-limit: 3
+        - type: custom-api
+          title: Currently Reading
+          cache: 6h
+          url: http://aggregator:5000/goodreads-reading
+          template: |
+            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+            {{ range .JSON.Array "specials.items" }}
+              <div style="text-align: center;">
+                <img src="{{ .String "book_cover" }}" alt="{{ .String "book_name" }}" style="display: block; margin: 0 auto 15px auto; max-width: 150px; height: auto;" />
+                <a href="{{ .String "book_link" }}" class="size-h3 color-positive" style="margin: 10px 0 5px 0;">{{ .String "book_name" }}</a>
+                <p style="margin: 0; font-style: italic;">{{ .String "author" }}</p>
+              </div>
+            {{ end }}
+            </ul>
 
         - type: custom-api
           title: Last Plays
@@ -238,35 +256,20 @@
       widgets:
         - type: calendar
           first-day-of-week: monday
-    
-        - type: weather
-          units: metric
-          hour-format: 24h
-          location: Porto, Portugal
-
-        - type: clock
-          hour-format: 24h
-          timezones:
-            - timezone: Europe/Lisbon
-              label: Portugal
-            - timezone: Europe/Berlin
-              label: Germany
-            - timezone: Asia/Kuala_Lumpur
-              label: Malaysia
-
+        - type: split-column
+          widgets:
+            - type: to-do
+              title: Tasks
+              id: month-tasks
+            - type: to-do
+              title: Events
+              id: month-events
+        
     - size: small
       widgets:
-        - type: custom-api
-          title: Currently Reading
-          cache: 6h
-          url: http://aggregator:5000/goodreads-reading
-          template: |
-            <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
-            {{ range .JSON.Array "specials.items" }}
-              <div style="text-align: center;">
-                <img src="{{ .String "book_cover" }}" alt="{{ .String "book_name" }}" style="display: block; margin: 0 auto 15px auto; max-width: 150px; height: auto;" />
-                <a href="{{ .String "book_link" }}" class="size-h3 color-positive" style="margin: 10px 0 5px 0;">{{ .String "book_name" }}</a>
-                <p style="margin: 0; font-style: italic;">{{ .String "author" }}</p>
-              </div>
-            {{ end }}
-            </ul>
+        - type: repository
+          title: Coding Projects
+          repository: beatrizq/glance
+          pull-requests-limit: 0
+          issues-limit: 0
+          commits-limit: 3
