@@ -5,9 +5,10 @@ import xmltodict
 import json
 import time
 
-user = os.getenv('BEEMINDER_USER')
-auth_token = os.getenv('BEEMINDER_AUTH_TOKEN')
-todoist_token = os.getenv('TODOIST_TOKEN')
+tmdb_token = os.getenv('TMDB_TOKEN')
+bgg_user = os.getenv('BGG_USER')
+goodreads_id = os.getenv('GOODREADS_ID')
+worldnewsapi_key = os.getenv('WORDLNEWSAPI_KEY')
 
 app = Flask(__name__)
 
@@ -43,7 +44,7 @@ def get_bgg_hotness():
 
 @app.route('/bgg-lastplays')
 def get_bgg_lastplays():
-    url = "https://boardgamegeek.com/xmlapi2/plays?username=trispancakes"
+    url = f'https://boardgamegeek.com/xmlapi2/plays?username={bgg_user}'
     resp = requests.get(url)
     if resp.status_code == 200:
         data_dict = xmltodict.parse(resp.content)
@@ -82,7 +83,7 @@ def get_currently_reading():
     "Accept-Language": "en-US,en;q=0.5",
     "Referer": "https://www.goodreads.com/",
     }
-    url = "https://www.goodreads.com/review/list_rss/9476155?shelf=currently-reading"
+    url = f'https://www.goodreads.com/review/list_rss/{goodreads_id}?shelf=currently-reading'
     resp = requests.get(url, headers=headers)
     if resp.status_code == 200:
         rss = xmltodict.parse(resp.content)
@@ -122,9 +123,9 @@ def get_pt_news():
     from datetime import date, timedelta
     yesterday = date.today() - timedelta(days=1)
     yesterday_str = yesterday.strftime('%Y-%m-%d')
-    url_yesterday = f"https://api.worldnewsapi.com/top-news?source-country=pt&language=pt&date={yesterday_str}&api-key=679d6630d03a47b5bd6d480799448e3b"
+    url_yesterday = f"https://api.worldnewsapi.com/top-news?source-country=pt&language=pt&date={yesterday_str}&api-key={worldnewsapi_key}"
     today_str = date.today().strftime('%Y-%m-%d')
-    url_today = f"https://api.worldnewsapi.com/top-news?source-country=pt&language=pt&date={today_str}&api-key=679d6630d03a47b5bd6d480799448e3b"
+    url_today = f"https://api.worldnewsapi.com/top-news?source-country=pt&language=pt&date={today_str}&api-key={worldnewsapi_key}"
     resp = requests.get(url_today)
     if resp.status_code == 200:
         data = resp.json()
@@ -166,6 +167,64 @@ def get_pt_news():
                 "id": "cat_specials",
                 "name": "Specials",
                 "items": news
+            }
+        }
+    return jsonify(wrapped_data)
+
+@app.route('/trending_movies')
+def get_top_movies():
+    url = "https://api.themoviedb.org/3/trending/movie/day"
+    headers = {
+    'Content-Type': 'application/json',
+    'Authorization': f'Bearer {tmdb_token}'
+}
+    resp = requests.get(url, headers=headers)
+    if resp.status_code == 200:
+        data_dict = resp.json()
+        movies_raw = data_dict["results"]
+        movies = []
+        for m in movies_raw:
+            movie = {
+                "title": m.get("title"),
+                "release_date": m.get("release_date"),
+                "poster_path": f'https://image.tmdb.org/t/p/w500{m.get("poster_path")}',
+                "url": f'https://www.themoviedb.org/movie/{m.get("id")}'
+            }
+            movies.append(movie)
+        wrapped_data = {
+            "specials": {
+                "id": "cat_specials",
+                "name": "Specials",
+                "items": movies
+            }
+        }
+    return jsonify(wrapped_data)
+
+@app.route('/trending_tv')
+def get_top_tv():
+    url = "https://api.themoviedb.org/3/trending/tv/day"
+    headers = {
+    'Content-Type': 'application/json',
+    'Authorization': f'Bearer {tmdb_token}'
+}
+    resp = requests.get(url, headers=headers)
+    if resp.status_code == 200:
+        data_dict = resp.json()
+        shows_raw = data_dict["results"]
+        shows = []
+        for m in shows_raw:
+            show = {
+                "name": m.get("name"),
+                "first_air_date": m.get("first_air_date"),
+                "poster_path": f'https://image.tmdb.org/t/p/w500{m.get("poster_path")}',
+                "url": f'https://www.themoviedb.org/tv/{m.get("id")}'
+            }
+            shows.append(show)
+        wrapped_data = {
+            "specials": {
+                "id": "cat_specials",
+                "name": "Specials",
+                "items": shows
             }
         }
     return jsonify(wrapped_data)
